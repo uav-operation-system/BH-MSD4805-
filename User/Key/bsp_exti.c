@@ -56,7 +56,7 @@ void EXTI_Key_Config(void)
 	EXTI_InitTypeDef EXTI_InitStructure;
 
 	/*开启按键GPIO口的时钟*/
-	RCC_APB2PeriphClockCmd(KEY1_INT_GPIO_CLK,ENABLE);
+	RCC_APB2PeriphClockCmd(KEY1_INT_GPIO_CLK, ENABLE);
 												
 	/* 配置 NVIC 中断*/
 	NVIC_Configuration();
