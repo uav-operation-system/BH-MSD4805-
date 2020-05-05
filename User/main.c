@@ -34,8 +34,8 @@ int main(void)
     EXTI_Key_Config();
     //初始化串口
     USART_Config();
-	//步进电机初始化
-	MSD_Init();
+		//步进电机初始化
+		MSD_Init();
     //打印帮助命令
     ShowHelp();
     
