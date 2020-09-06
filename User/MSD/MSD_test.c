@@ -23,22 +23,23 @@
 #include "bsp_led.h"
 #include "MicroStepDriver.h" 
 void ShowHelp(void);
-void ShowData(int position, int acceleration, int deceleration, int speed, int steps);
+void ShowData(int position, int acceleration, int deceleration, int speed, int steps, int Motor_position);
 void Delay(__IO u32 nCount);
 
 /*! \brief 打印帮助命令
  */
 void ShowHelp(void)
 {
-    printf("\n\r——————————————秉火步进电机驱动演示程序——————————————");
+    printf("\n\r——————————————步进电机驱动演示程序——————————————");
     printf("\n\r输入命令：");
     printf("\n\r< ? >       -帮助菜单");
     printf("\n\ra[data]     -设置步进电机的加速度（范围：71—32000）单位为：0.01rad/s^2");
     printf("\n\rd[data]     -设置步进电机的减速度（范围：71—32000）单位为：0.01rad/s^2");
     printf("\n\rs[data]     -设置步进电机的最大速度（范围：12—3000）单位为：0.01rad/s");
-    printf("\n\rm[data]     -以设定的步数移动步进电机（范围：-2147483647—2147483647，其中正数为顺时针，负数为逆时针）");
-  
-    printf("\n\rmove [steps] [accel] [decel] [speed]");
+    printf("\n\rm[data]     -以设定的步数移动步进电机（范围：-2147483647—2147483647，其中正数为顺时针，负数为逆时针）"); 
+		printf("\n\rp[data]     -设置舵机的位置(范围:0-2)");
+	
+    printf("\n\rmove [steps] [accel] [decel] [speed] [motor_position]");
     printf("\n\r            -以设定的步数、加速度，减速度，最大速度开始运动");
     printf("\n\r<Enter键>   -重复最后一次动作");
     printf("\n\r开发板按键，KEY1：驱动器禁止输出(脱机状态)  KEY2：驱动器恢复正常工作\n\r ");
@@ -51,13 +52,14 @@ void ShowHelp(void)
  *  \param speed        最大速度
  *  \param steps        移动步数
  */
-void ShowData(int position, int acceleration, int deceleration, int speed, int steps)
+void ShowData(int position, int acceleration, int deceleration, int speed, int steps, int Motor_position)
 {
   printf("\n\r加速度:%.2frad/s^2",1.0*acceleration/100);
   printf("  减速度:%.2frad/s^2",1.0*deceleration/100);
   printf("  最大速度:%.2frad/s(%.2frpm)",1.0*speed/100,9.55*speed/100);
   printf("  移动步数:%d",steps);
   printf("\n\r电机当前位置: %d\r\n",position);
+	printf("\n\r舵机的位置: %d\r\n",Motor_position);
 }
 /**
 
@@ -79,6 +81,8 @@ void DealSerialData(void)
     static int deceleration = 32000;
     //默认最大速度
     static int speed = 3000;
+		//默认舵机中位
+		static int Motor_position = 0;
     
     int acc_temp=0;
     int dec_temp=0;
@@ -89,7 +93,7 @@ void DealSerialData(void)
     if(showflag)
     {
       showflag = 0;
-      ShowData(stepPosition, acceleration, deceleration, speed, steps);
+      ShowData(stepPosition, acceleration, deceleration, speed, steps, Motor_position);
     }
     //检查是否接收到指令
     if(status.cmd == TRUE)
@@ -182,7 +186,7 @@ void DealSerialData(void)
         okCmd = TRUE;
       }
       else if(UART_RxBuffer[0] == '?')
-      {
+       {
         //打印帮助命令
         ShowHelp();
         okCmd = TRUE;
@@ -193,6 +197,10 @@ void DealSerialData(void)
         MSD_demo_run();         
         okCmd = TRUE;
       }
+			else if(UART_RxBuffer[0] == 'p')
+			{
+				
+			}
       //如果指令有无则打印帮助命令
       if(okCmd != TRUE)
       {
@@ -216,7 +224,7 @@ void DealSerialData(void)
         if(status.out_ena == TRUE)
         {
           printf("OK\n\r");
-          ShowData(stepPosition, acceleration, deceleration, speed, steps);  
+          ShowData(stepPosition, acceleration, deceleration, speed, steps, Motor_position);  
         }
 
       }
@@ -253,7 +261,7 @@ void MSD_demo_run(void)
                 Delay(0xFFFFF);
                 MSD_Move(SPR*step_num[step_cnt], 32000, 32000, 3000);
 
-                ShowData(stepPosition, 32000, 32000, 3000, SPR*step_num[step_cnt]);
+                ShowData(stepPosition, 32000, 32000, 3000, SPR*step_num[step_cnt], 0);
                 step_cnt++;  
             }
     }

@@ -61,25 +61,54 @@ typedef struct {
 
 
 // 当使用不同的定时器的时候，对应的GPIO是不一样的，这点要注意
-// 这里我们使用定时器TIM2
+// 这里滑台使用定时器TIM2
 #define            MSD_PULSE_TIM                    TIM2
 #define            MSD_PULSE_TIM_APBxClock_FUN      RCC_APB1PeriphClockCmd
-#define            MSD_PULSE_TIM_CLK                RCC_APB1Periph_TIM2
-// 定时器输出PWM通道，PA0是通道1
+#define            MSD_PULSE_TIM_CLK                RCC_APB1Periph_TIM3
+
+// 这里舵机使用定时器TIM3
+#define            SERVO_PULSE_TIM                  TIM3
+#define            SERVO_PULSE_TIM_APBxClock_FUN    RCC_APB1PeriphClockCmd
+#define            SERVO_PULSE_TIM_CLK              RCC_APB1Periph_TIM3
+
+// 定时器输出PWM通道，PA0是滑台输出通道1
 #define            MSD_PULSE_OCx_Init               TIM_OC4Init
 #define            MSD_PULSE_OCx_PreloadConfig      TIM_OC4PreloadConfig
+
+// 定时器输出PWM通道，PA6是舵机通道1
+#define            SERVO_PULSE_OC1_Init             TIM_OC1Init
+#define            SERVO_PULSE_OC1_PreloadConfig    TIM_OC1PreloadConfig
+
+// 定时器输出PWM通道，PA6是舵机通道2
+#define            SERVO_PULSE_OC2_Init             TIM_OC2Init
+#define            SERVO_PULSE_OC2_PreloadConfig    TIM_OC2PreloadConfig
+
 // 定时器中断
 #define            MSD_PULSE_TIM_IRQ                TIM2_IRQn
 #define            MSD_PULSE_TIM_IRQHandler         TIM2_IRQHandler
 
-// PWM 信号的频率 F = TIM_CLK/{(ARR+1)*(PSC+1)}
+// 定时器中断
+#define            SERVO_PULSE_TIM_IRQ              TIM3_IRQn
+#define            SERVO_PULSE_TIM_IRQHandler       TIM3_IRQHandler
+
+// TIM2 PWM 信号的频率 F = TIM_CLK/{(ARR+1)*(PSC+1)}
 #define            MSD_PULSE_TIM_PERIOD             (10-1)
 #define            MSD_PULSE_TIM_PSC                (72-1)
+
+// TIM3 PWM 信号的频率 F = TIM_CLK/{(ARR+1)*(PSC+1)}
+#define            SERVO_PULSE_TIM_PERIOD           (10000-1)
+#define            SERVO_PULSE_TIM_PSC              (72-1)
 
 // 步进电机脉冲输出通道
 #define            MSD_PULSE_GPIO_CLK               RCC_APB2Periph_GPIOA
 #define            MSD_PULSE_PORT                   GPIOA
 #define            MSD_PULSE_PIN                    GPIO_Pin_3
+
+// 舵机脉冲输出通道1
+#define            SERVO_PULSE_GPIO_CLK             RCC_APB2Periph_GPIOA
+#define            SERVO_PULSE_PORT                 GPIOA
+#define            SERVO_PULSE_PIN1                 GPIO_Pin_6
+#define            SERVO_PULSE_PIN2                 GPIO_Pin_7
 
 // 步进电机方向控制
 #define            MSD_DIR_GPIO_CLK                 RCC_APB2Periph_GPIOB
@@ -91,6 +120,7 @@ typedef struct {
 #define            MSD_ENA_PORT                     GPIOC
 #define            MSD_ENA_PIN                      GPIO_Pin_4
 
+//
 
 #define DIR(a)	if (a == CW)	\
 					GPIO_ResetBits(MSD_DIR_PORT,MSD_DIR_PIN);\
