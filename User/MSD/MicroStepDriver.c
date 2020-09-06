@@ -130,7 +130,7 @@ static void TIM3_Mode_Config(void)
   // 自动重装载寄存器的值，累计TIM_Period+1个周期后产生一个更新或者中断
 	TIM_TimeBaseStructure.TIM_Period = SERVO_PULSE_TIM_PERIOD;	
 	// 驱动CNT计数器的时钟 = Fck_int/(psc+1)
-	TIM_TimeBaseStructure.TIM_Prescaler = MSD_PULSE_TIM_PSC;	
+	TIM_TimeBaseStructure.TIM_Prescaler = SERVO_PULSE_TIM_PSC;	
 	// 时钟分频因子 ，配置死区时间时需要用到
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;		
 	// 计数器计数模式，设置为向上计数

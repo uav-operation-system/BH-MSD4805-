@@ -230,7 +230,8 @@ void DealSerialData(void)
         while(status.running == TRUE)
         {
           if(status.out_ena != TRUE)
-          break;
+					break;
+          
         };
         if(status.out_ena == TRUE)
         {

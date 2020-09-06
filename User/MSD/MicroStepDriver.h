@@ -65,7 +65,7 @@ typedef struct {
 // 这里滑台使用定时器TIM2
 #define            MSD_PULSE_TIM                    TIM2
 #define            MSD_PULSE_TIM_APBxClock_FUN      RCC_APB1PeriphClockCmd
-#define            MSD_PULSE_TIM_CLK                RCC_APB1Periph_TIM3
+#define            MSD_PULSE_TIM_CLK                RCC_APB1Periph_TIM2
 
 // 这里舵机使用定时器TIM3
 #define            SERVO_PULSE_TIM                  TIM3
