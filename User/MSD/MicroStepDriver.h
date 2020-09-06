@@ -11,7 +11,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define Pulse_width 20
+#define MSD_Pulse_width 20
+#define SERVO_Pulse_width 3300
 
 //系统状态
 struct GLOBAL_FLAGS {
@@ -96,7 +97,7 @@ typedef struct {
 #define            MSD_PULSE_TIM_PSC                (72-1)
 
 // TIM3 PWM 信号的频率 F = TIM_CLK/{(ARR+1)*(PSC+1)}
-#define            SERVO_PULSE_TIM_PERIOD           (10000-1)
+#define            SERVO_PULSE_TIM_PERIOD           (3300-1)
 #define            SERVO_PULSE_TIM_PSC              (72-1)
 
 // 步进电机脉冲输出通道
@@ -132,7 +133,8 @@ typedef struct {
 void MSD_Init(void);
 void MSD_ENA(FunctionalState NewState);
 void MSD_Move(signed int step, unsigned int accel, unsigned int decel, unsigned int speed);
-
+void Servo_Move(int pwm_val);
+					
 #endif	/* __BSP_ADVANCETIME_H */
 
 

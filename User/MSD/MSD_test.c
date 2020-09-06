@@ -23,7 +23,7 @@
 #include "bsp_led.h"
 #include "MicroStepDriver.h" 
 void ShowHelp(void);
-void ShowData(int position, int acceleration, int deceleration, int speed, int steps, int Motor_position);
+void ShowData(int position, int acceleration, int deceleration, int speed, int steps);
 void Delay(__IO u32 nCount);
 
 /*! \brief 打印帮助命令
@@ -52,14 +52,13 @@ void ShowHelp(void)
  *  \param speed        最大速度
  *  \param steps        移动步数
  */
-void ShowData(int position, int acceleration, int deceleration, int speed, int steps, int Motor_position)
+void ShowData(int position, int acceleration, int deceleration, int speed, int steps)
 {
   printf("\n\r加速度:%.2frad/s^2",1.0*acceleration/100);
   printf("  减速度:%.2frad/s^2",1.0*deceleration/100);
   printf("  最大速度:%.2frad/s(%.2frpm)",1.0*speed/100,9.55*speed/100);
   printf("  移动步数:%d",steps);
   printf("\n\r电机当前位置: %d\r\n",position);
-	printf("\n\r舵机的位置: %d\r\n",Motor_position);
 }
 /**
 
@@ -87,13 +86,14 @@ void DealSerialData(void)
     int acc_temp=0;
     int dec_temp=0;
     int speed_temp=0;
+		int position_temp=1;
     
     //接收到正确的指令才为TRUE
     char okCmd = FALSE;
     if(showflag)
     {
       showflag = 0;
-      ShowData(stepPosition, acceleration, deceleration, speed, steps, Motor_position);
+      ShowData(stepPosition, acceleration, deceleration, speed, steps);
     }
     //检查是否接收到指令
     if(status.cmd == TRUE)
@@ -199,7 +199,18 @@ void DealSerialData(void)
       }
 			else if(UART_RxBuffer[0] == 'p')
 			{
-				
+				if(UART_RxBuffer[1]== '0')
+				{
+					position_temp=0;
+					Servo_Move(position_temp);
+					okCmd = TRUE;
+				}
+				if(UART_RxBuffer[1]== '1')
+				{
+					position_temp=2;
+					Servo_Move(position_temp);
+					okCmd = TRUE;
+				}
 			}
       //如果指令有无则打印帮助命令
       if(okCmd != TRUE)
@@ -224,7 +235,7 @@ void DealSerialData(void)
         if(status.out_ena == TRUE)
         {
           printf("OK\n\r");
-          ShowData(stepPosition, acceleration, deceleration, speed, steps, Motor_position);  
+          ShowData(stepPosition, acceleration, deceleration, speed, steps);  
         }
 
       }
@@ -261,7 +272,7 @@ void MSD_demo_run(void)
                 Delay(0xFFFFF);
                 MSD_Move(SPR*step_num[step_cnt], 32000, 32000, 3000);
 
-                ShowData(stepPosition, 32000, 32000, 3000, SPR*step_num[step_cnt], 0);
+                ShowData(stepPosition, 32000, 32000, 3000, SPR*step_num[step_cnt]);
                 step_cnt++;  
             }
     }

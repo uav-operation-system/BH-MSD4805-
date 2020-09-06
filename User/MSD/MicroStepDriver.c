@@ -86,6 +86,15 @@ static void MSD_GPIO_Config(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(MSD_ENA_PORT, &GPIO_InitStructure);
     GPIO_ResetBits(MSD_ENA_PORT,MSD_ENA_PIN);
+		
+		//舵机输出 GPIO 初始化
+    RCC_APB2PeriphClockCmd(SERVO_PULSE_GPIO_CLK, ENABLE);
+    GPIO_InitStructure.GPIO_Pin =  SERVO_PULSE_PIN1;
+		GPIO_InitStructure.GPIO_Pin =  SERVO_PULSE_PIN2;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(SERVO_PULSE_PORT, &GPIO_InitStructure);
+		
 }
 
 
@@ -112,13 +121,13 @@ static void MSD_GPIO_Config(void)
 
 static void TIM3_Mode_Config(void)
 {
-  // 开启定时器时钟,即内部时钟CK_INT=72M
+	// 开启定时器时钟,即内部时钟CK_INT=72M
 	SERVO_PULSE_TIM_APBxClock_FUN(SERVO_PULSE_TIM_CLK, ENABLE);
 
-    /*--------------------时基结构体初始化-------------------------*/
+  /*--------------------时基结构体初始化-------------------------*/
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    // 自动重装载寄存器的值，累计TIM_Period+1个周期后产生一个更新或者中断
+  // 自动重装载寄存器的值，累计TIM_Period+1个周期后产生一个更新或者中断
 	TIM_TimeBaseStructure.TIM_Period = SERVO_PULSE_TIM_PERIOD;	
 	// 驱动CNT计数器的时钟 = Fck_int/(psc+1)
 	TIM_TimeBaseStructure.TIM_Prescaler = MSD_PULSE_TIM_PSC;	
@@ -164,6 +173,7 @@ static void TIM3_Mode_Config(void)
   TIM_ITConfig(SERVO_PULSE_TIM, TIM_IT_Update, ENABLE);
 	// 使能计数器
 	TIM_Cmd(SERVO_PULSE_TIM, DISABLE);
+	
 }
 
 
@@ -172,14 +182,14 @@ static void TIM2_Mode_Config(void)
   // 开启定时器时钟,即内部时钟CK_INT=72M
 	MSD_PULSE_TIM_APBxClock_FUN(MSD_PULSE_TIM_CLK, ENABLE);
 
-    /*--------------------时基结构体初始化-------------------------*/
+  /*--------------------时基结构体初始化-------------------------*/
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    // 自动重装载寄存器的值，累计TIM_Period+1个周期后产生一个更新或者中断
+  // 自动重装载寄存器的值，累计TIM_Period+1个周期后产生一个更新或者中断
 	TIM_TimeBaseStructure.TIM_Period = MSD_PULSE_TIM_PERIOD;	
 	// 驱动CNT计数器的时钟 = Fck_int/(psc+1)
 	TIM_TimeBaseStructure.TIM_Prescaler = MSD_PULSE_TIM_PSC;	
-	// 时钟分频因子 ，配置死区时间时需要用到
+	// 时钟分频因子，配置死区时间时需要用到
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;		
 	// 计数器计数模式，设置为向上计数
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;		
@@ -204,17 +214,17 @@ static void TIM2_Mode_Config(void)
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
     
 	MSD_PULSE_OCx_Init(MSD_PULSE_TIM, &TIM_OCInitStructure);
-    //使能TIM2_CH1预装载寄存器
+  //使能TIM2_CH1预装载寄存器
 	MSD_PULSE_OCx_PreloadConfig(MSD_PULSE_TIM, TIM_OCPreload_Enable);
-    //使能TIM2预装载寄存器
-    TIM_ARRPreloadConfig(MSD_PULSE_TIM, ENABLE); 
+  //使能TIM2预装载寄存器
+  TIM_ARRPreloadConfig(MSD_PULSE_TIM, ENABLE); 
     
-    //设置中断源，只有溢出时才中断
-    TIM_UpdateRequestConfig(MSD_PULSE_TIM, TIM_UpdateSource_Regular);
+  //设置中断源，只有溢出时才中断
+  TIM_UpdateRequestConfig(MSD_PULSE_TIM, TIM_UpdateSource_Regular);
 	// 清除中断标志位
 	TIM_ClearITPendingBit(MSD_PULSE_TIM, TIM_IT_Update);
-    // 使能中断
-    TIM_ITConfig(MSD_PULSE_TIM, TIM_IT_Update, ENABLE);
+  // 使能中断
+  TIM_ITConfig(MSD_PULSE_TIM, TIM_IT_Update, ENABLE);
 	// 使能计数器
 	TIM_Cmd(MSD_PULSE_TIM, DISABLE);
 }
@@ -276,15 +286,24 @@ void MSD_ENA(FunctionalState NewState)
  *  \param decel  减速度,如果取值为100，实际值为100*0.01*rad/sec^2=1rad/sec^2
  *  \param speed  最大速度,如果取值为100，实际值为100*0.01*rad/sec=1rad/sec
  */
-void Servo_Move(unsigned int pwm_val)
+void Servo_Move(int pwm_val)
 {
 	
 		//设置定时器重装值	
-    TIM_SetAutoreload(MSD_PULSE_TIM,Pulse_width);
-    //设置占空比为50%	
-    TIM_SetCompare2(MSD_PULSE_TIM,Pulse_width>>1);
+    TIM_SetAutoreload(SERVO_PULSE_TIM,SERVO_Pulse_width);
+    //设置占空比
+		if(pwm_val==0)
+		{
+			TIM_SetCompare1(SERVO_PULSE_TIM,640);
+			TIM_SetCompare2(SERVO_PULSE_TIM,640);
+		}
+    if(pwm_val==2)
+		{
+			TIM_SetCompare1(SERVO_PULSE_TIM,2000);
+			TIM_SetCompare2(SERVO_PULSE_TIM,2000);
+		}
     //使能定时器	      
-    TIM_Cmd(MSD_PULSE_TIM, ENABLE); 
+    TIM_Cmd(SERVO_PULSE_TIM, ENABLE); 
 	
 }
 
@@ -322,9 +341,9 @@ void MSD_Move(signed int step, unsigned int accel, unsigned int decel, unsigned 
         // 配置电机为运行状态
         status.running = TRUE;
         //设置定时器重装值	
-        TIM_SetAutoreload(MSD_PULSE_TIM,Pulse_width);
+        TIM_SetAutoreload(MSD_PULSE_TIM,MSD_Pulse_width);
         //设置占空比为50%	
-        TIM_SetCompare2(MSD_PULSE_TIM,Pulse_width>>1);
+        TIM_SetCompare2(MSD_PULSE_TIM,MSD_Pulse_width>>1);
         //使能定时器	      
         TIM_Cmd(MSD_PULSE_TIM, ENABLE); 
      }
@@ -394,9 +413,9 @@ void MSD_Move(signed int step, unsigned int accel, unsigned int decel, unsigned 
     srd.accel_count = 0;
     status.running = TRUE;
     //设置定时器重装值	
-    TIM_SetAutoreload(MSD_PULSE_TIM,Pulse_width);
+    TIM_SetAutoreload(MSD_PULSE_TIM,MSD_Pulse_width);
     //设置占空比为50%	
-    TIM_SetCompare2(MSD_PULSE_TIM,Pulse_width>>1);
+    TIM_SetCompare2(MSD_PULSE_TIM,MSD_Pulse_width>>1);
     //使能定时器	      
     TIM_Cmd(MSD_PULSE_TIM, ENABLE); 
     }
