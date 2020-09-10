@@ -294,13 +294,13 @@ void Servo_Move(int pwm_val)
     //设置占空比
 		if(pwm_val==0)
 		{
-			TIM_SetCompare1(SERVO_PULSE_TIM,640);
-			TIM_SetCompare2(SERVO_PULSE_TIM,640);
+			TIM_SetCompare1(SERVO_PULSE_TIM,900);
+			TIM_SetCompare2(SERVO_PULSE_TIM,900);
 		}
     if(pwm_val==2)
 		{
-			TIM_SetCompare1(SERVO_PULSE_TIM,2000);
-			TIM_SetCompare2(SERVO_PULSE_TIM,2000);
+			TIM_SetCompare1(SERVO_PULSE_TIM,1800);
+			TIM_SetCompare2(SERVO_PULSE_TIM,1800);
 		}
     //使能定时器	      
     TIM_Cmd(SERVO_PULSE_TIM, ENABLE); 

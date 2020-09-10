@@ -12,7 +12,7 @@
 #define FALSE 0
 
 #define MSD_Pulse_width 20
-#define SERVO_Pulse_width 3300
+#define SERVO_Pulse_width 3500
 
 //系统状态
 struct GLOBAL_FLAGS {
@@ -97,8 +97,8 @@ typedef struct {
 #define            MSD_PULSE_TIM_PSC                (72-1)
 
 // TIM3 PWM 信号的频率 F = TIM_CLK/{(ARR+1)*(PSC+1)}
-#define            SERVO_PULSE_TIM_PERIOD           (3300-1)
-#define            SERVO_PULSE_TIM_PSC              (72-1)
+#define            SERVO_PULSE_TIM_PERIOD           (1750-1)
+#define            SERVO_PULSE_TIM_PSC              (50-1)
 
 // 步进电机脉冲输出通道
 #define            MSD_PULSE_GPIO_CLK               RCC_APB2Periph_GPIOA

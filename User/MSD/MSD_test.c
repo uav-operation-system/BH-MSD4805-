@@ -80,13 +80,10 @@ void DealSerialData(void)
     static int deceleration = 32000;
     //默认最大速度
     static int speed = 3000;
-		//默认舵机中位
-		static int Motor_position = 0;
     
     int acc_temp=0;
     int dec_temp=0;
     int speed_temp=0;
-		int position_temp=1;
     
     //接收到正确的指令才为TRUE
     char okCmd = FALSE;
@@ -201,14 +198,12 @@ void DealSerialData(void)
 			{
 				if(UART_RxBuffer[1]== '0')
 				{
-					position_temp=0;
-					Servo_Move(position_temp);
+					Servo_Move(0);
 					okCmd = TRUE;
 				}
 				if(UART_RxBuffer[1]== '1')
 				{
-					position_temp=2;
-					Servo_Move(position_temp);
+					Servo_Move(2);
 					okCmd = TRUE;
 				}
 			}
